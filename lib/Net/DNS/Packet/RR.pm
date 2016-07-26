@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Carp;
 
+use overload '""' => 'stringify';
+
 use Net::DNS::Packet::RR::A;
 use Net::DNS::Packet::RR::AAAA;
 use Net::DNS::Packet::RR::NS;
@@ -13,7 +15,7 @@ use Net::DNS::Packet::RR::PTR;
 use Net::DNS::Packet::RR::MX;
 use Net::DNS::Packet::RR::TXT;
 
-my @CLASSES = qw/IN CS CH HS/;
+my @CLASSES = qw/?? IN CS CH HS/;
 
 our %TYPES = (
     1 => 'A',
@@ -40,12 +42,22 @@ sub new($$) {
     ($self->{'_type'}, $self->{'_class'}, $self->{'_ttl'}, $self->{'_rdlength'}) = @nums;
     $offset += 10;
     $self->{'_end_offset'} = $offset + $self->{'_rdlength'};
-    if ($self->f_type_s ne '???') {
+    if ($self->f_type_s !~ /^\?\?\?/) {
         no strict 'refs';
         my $klass = 'Net::DNS::Packet::RR::' . $self->f_type_s;
         $self->{'_rdata'} = $klass->new($raw_data, $offset, $self->{'_rdlength'});
     }
     return $self;
+}
+
+sub f_name() {
+    my $self = shift;
+    return $self->{'_name'};
+}
+
+sub f_name_s() {
+    my $self = shift;
+    return $self->f_name->stringify;
 }
 
 sub f_type() {
@@ -55,7 +67,8 @@ sub f_type() {
 
 sub f_type_s() {
     my $self = shift;
-    return $TYPES{$self->f_type} ? $TYPES{$self->f_type} : '???';
+    my $ft = $self->f_type;
+    return $TYPES{$ft} ? $TYPES{$ft} : "??? ($ft)";
 }
 
 sub f_class() {
@@ -65,7 +78,8 @@ sub f_class() {
 
 sub f_class_s() {
     my $self = shift;
-    return $CLASSES[$self->f_class] ? $CLASSES[$self->f_class] : '???';
+    my $fc = $self->f_class;
+    return $CLASSES[$fc] ? $CLASSES[$fc] : "??? ($fc)";
 }
 
 sub f_ttl() {
@@ -78,8 +92,19 @@ sub f_rdlength() {
     return $self->{'_rdlength'};
 }
 
+sub f_rdata() {
+    my $self = shift;
+    return $self->{'_rdata'};
+}
+
 sub end_offset() {
     my $self = shift;
     return $self->{'_end_offset'};
 }
+
+sub stringify() {
+    my $self = shift;
+    return sprintf '%s %d %s %s %s', $self->f_name, $self->f_ttl, $self->f_class_s, $self->f_type_s, $self->{'_rdata'} ? $self->{'_rdata'}->stringify : '???';
+}
+
 1;

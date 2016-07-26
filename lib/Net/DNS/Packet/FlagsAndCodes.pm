@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Carp;
 
+use overload '""' => 'stringify';
+
 my @OPCODES = qw/QUERY IQUERY STATUS (reserved) NOTIFY UPDATE/;
 
 my @RCODES = qw/NOERR FORMERR SERVFAIL NXDOMAIN NOTIMP REFUSED YXDOMAIN TXRRSET NXRRSET NOTAUTH NOTZONE/;
@@ -53,7 +55,8 @@ sub f_opcode() {
 
 sub f_opcode_s() {
     my $self = shift;
-    return $OPCODES[$self->f_opcode] ? $OPCODES[$self->f_opcode] : '???';
+    my $o = $self->f_opcode;
+    return $OPCODES[$o] ? $OPCODES[$o] : "??? ($o)";
 }
 
 sub f_aa() {
@@ -98,6 +101,15 @@ sub f_rcode() {
 
 sub f_rcode_s() {
     my $self = shift;
-    return $RCODES[$self->f_rcode] ? $RCODES[$self->f_rcode] : '???';
+    my $rc = $self->f_rcode;
+    return $RCODES[$rc] ? $RCODES[$rc] : "??? ($rc)";
 }
+
+sub stringify() {
+    my $self = shift;
+    return sprintf '%04x (qr=%d; op=%d (%s); aa=%d; tc=%d; rd=%d; zero=%d; rc=%d (%s))',
+        $self->f_raw, $self->f_qr, $self->f_opcode, $self->f_opcode_s, $self->f_aa,
+        $self->f_tc, $self->f_rd, $self->f_zero, $self->f_rcode, $self->f_rcode_s;
+}
+
 1;

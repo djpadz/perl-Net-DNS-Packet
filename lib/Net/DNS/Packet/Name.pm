@@ -17,7 +17,7 @@ sub _get_strings($$) {
         if ($len > 63) {
             my ($val) = unpack("x[$ptr] n", $bindat);
             $val &= 0x3fff;
-            push @strings, _get_strings($bindat, $val);
+            push @strings, @{_get_strings($bindat, $val)};
             ++$ptr;
             last;
         }

@@ -8,6 +8,8 @@ use Net::DNS::Packet::FlagsAndCodes;
 use Net::DNS::Packet::Question;
 use Net::DNS::Packet::RR;
 
+use overload '""' => 'stringify';
+
 our $VERSION = 1.00;
 
 sub new($) {
@@ -32,7 +34,7 @@ sub new($) {
         $offset = $q->end_offset;
     }
     foreach my $t ('_anc', '_nsc', '_arc') {
-        my ($ak) = $t =~ /^(..)/;
+        my ($ak) = $t =~ /^(_..)/;
         foreach (1..$self->{$t}) {
             my $rr = Net::DNS::Packet::RR->new($raw_data, $offset);
             push @{$self->{$ak}}, $rr;
@@ -50,6 +52,11 @@ sub f_raw() {
 sub f_id() {
     my $self = shift;
     return $self->{'_id'};
+}
+
+sub f_fc() {
+    my $self = shift;
+    return $self->{'_fc'};
 }
 
 sub f_qdcount() {
@@ -71,4 +78,19 @@ sub f_arcount() {
     my $self = shift;
     return $self->{'_arc'};
 }
+
+sub stringify() {
+    my $self = shift;
+    my $ret = sprintf 'id=%d; fc=%s; qc=%d; anc=%d; nsc=%d; arc=%d', $self->f_id, $self->f_fc->stringify, $self->f_qdcount, $self->f_ancount, $self->f_nscount, $self->f_arcount;
+    foreach my $t ('_q', '_an', '_ns', '_ar') {
+        my ($l) = $t =~ /^_(.*)/;
+        $l = uc $l;
+        next unless $self->{$t};
+        foreach (@{$self->{$t}}) {
+            $ret .= sprintf "\n\t%s: %s", $l, $_->stringify;
+        }
+    }
+    return $ret;
+}
+
 1;

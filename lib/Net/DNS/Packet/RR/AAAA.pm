@@ -27,7 +27,7 @@ sub f_aaaa() {
 
 sub stringify() {
     my $self = shift;
-    my @bytes = unpack('CCCC', $self->f_a);
+    my @bytes = unpack('CCCC', $self->f_aaaa);
     return join(':', map { sprintf('%x', $_) } @{$self->{'_aaaa'}});
 }
 
