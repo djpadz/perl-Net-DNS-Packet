@@ -1,0 +1,15 @@
+MANIFEST
+Makefile.PL
+lib/Net/DNS/Packet/FlagsAndCodes.pm
+lib/Net/DNS/Packet/Name.pm
+lib/Net/DNS/Packet/Question.pm
+lib/Net/DNS/Packet/RR/A.pm
+lib/Net/DNS/Packet/RR/CNAME.pm
+lib/Net/DNS/Packet/RR/MX.pm
+lib/Net/DNS/Packet/RR/NS.pm
+lib/Net/DNS/Packet/RR/PTR.pm
+lib/Net/DNS/Packet/RR/SOA.pm
+lib/Net/DNS/Packet/RR/TXT.pm
+lib/Net/DNS/Packet/RR.pm
+lib/Net/DNS/Packet.pm
+t/00-load.t
