@@ -79,6 +79,26 @@ sub f_arcount() {
     return $self->{'_arc'};
 }
 
+sub f_q() {
+    my $self = shift;
+    return $self->{'_q'};
+}
+
+sub f_an() {
+    my $self = shift;
+    return $self->{'_an'};
+}
+
+sub f_ns() {
+    my $self = shift;
+    return $self->{'_ns'};
+}
+
+sub f_ar() {
+    my $self = shift;
+    return $self->{'_ar'};
+}
+
 sub stringify() {
     my $self = shift;
     my $ret = sprintf 'id=%d; fc=%s; qc=%d; anc=%d; nsc=%d; arc=%d', $self->f_id, $self->f_fc->stringify, $self->f_qdcount, $self->f_ancount, $self->f_nscount, $self->f_arcount;
